@@ -12,7 +12,8 @@ export class UsersService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.seedAdminUser();
+    // Admin seed işlemi kaldırıldı - güvenlik gereği
+    // await this.seedAdminUser();
   }
 
   async findOne(username: string): Promise<User | undefined> {
@@ -27,19 +28,19 @@ export class UsersService implements OnModuleInit {
     return this.usersRepository.save(newUser);
   }
 
-  private async seedAdminUser() {
-    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
-    const adminUser = await this.findOne(adminUsername);
-
-    if (!adminUser) {
-      console.log('Admin kullanıcısı bulunamadı, oluşturuluyor...');
-      const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-      await this.create({
-        username: adminUsername,
-        password: adminPassword,
-        role: UserRole.ADMIN,
-      });
-      console.log('Admin kullanıcısı oluşturuldu.');
-    }
-  }
+  // private async seedAdminUser() {
+  //   const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+  //   const adminUser = await this.findOne(adminUsername);
+  //
+  //   if (!adminUser) {
+  //     console.log('Admin kullanıcısı bulunamadı, oluşturuluyor...');
+  //     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  //     await this.create({
+  //       username: adminUsername,
+  //       password: adminPassword,
+  //       role: UserRole.ADMIN,
+  //     });
+  //     console.log('Admin kullanıcısı oluşturuldu.');
+  //   }
+  // }
 }
