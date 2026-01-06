@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: adorego-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: adorego
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: adorego-backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=password123
+      - DB_DATABASE=adorego
+      - JWT_SECRET=adorego-super-secret-key-2024
+      - JWT_EXPIRES_IN=24h
+      - PORT=3001
+      - CORS_ORIGIN=http://localhost,http://localhost:5173
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./uploads:/app/uploads
+
+  frontend:
+    build: ../adorego-frontend
+    container_name: adorego-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data:

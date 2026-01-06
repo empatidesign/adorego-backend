@@ -1,6 +1,9 @@
 import { Controller, Get, Put, Body, UseGuards, Query, Param } from '@nestjs/common';
 import { ContentService } from './content.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '../users/user.entity';
 
 @Controller('content')
 export class ContentController {
@@ -74,7 +77,8 @@ export class ContentController {
 
   // Protected endpoints - Admin paneli için
   @Put('navbar')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateNavbar(@Body() body: { data: any; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateNavbar(data, lang);
@@ -82,7 +86,8 @@ export class ContentController {
   }
 
   @Put('hero')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateHero(@Body() body: { data: any; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateHero(data, lang);
@@ -90,7 +95,8 @@ export class ContentController {
   }
 
   @Put('features')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateFeatures(@Body() body: { data: any[]; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateFeatures(data, lang);
@@ -98,7 +104,8 @@ export class ContentController {
   }
 
   @Put('partners')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updatePartners(@Body() body: { data: any[]; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updatePartners(data, lang);
@@ -106,7 +113,8 @@ export class ContentController {
   }
 
   @Put('faq')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateFaq(@Body() body: { data: any[]; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateFaq(data, lang);
@@ -114,7 +122,8 @@ export class ContentController {
   }
 
   @Put('howitworks')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateHowItWorks(@Body() body: { data: any[]; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateHowItWorks(data, lang);
@@ -122,7 +131,8 @@ export class ContentController {
   }
 
   @Put('cta')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateCta(@Body() body: { data: any; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateCta(data, lang);
@@ -130,7 +140,8 @@ export class ContentController {
   }
 
   @Put('solutions')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateSolutions(@Body() body: { data: any; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateSolutions(data, lang);
@@ -138,7 +149,8 @@ export class ContentController {
   }
 
   @Put('seo/:page')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateSeo(@Param('page') page: string, @Body() body: { data: any; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateSeo(page, data, lang);
@@ -146,7 +158,8 @@ export class ContentController {
   }
 
   @Put('settings/:category')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   updateSiteSettings(@Param('category') category: string, @Body() body: { data: any; lang: string }) {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateSiteSettings(category, data, lang);

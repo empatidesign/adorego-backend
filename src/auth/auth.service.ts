@@ -1,39 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
-  // Basit admin kullanıcısı (gerçek uygulamada veritabanından gelir)
-  private readonly adminUser = {
-    username: process.env.ADMIN_USERNAME || 'admin',
-    // Şifre: admin123 (hash'lenmiş hali)
-    passwordHash: '$2b$10$XqZ8J7ZqZ8J7ZqZ8J7ZqZO.qZ8J7ZqZ8J7ZqZ8J7ZqZ8J7ZqZ8J7Z',
-  };
-
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
-    if (username !== this.adminUser.username) {
-      return null;
-    }
-
-    // Basit karşılaştırma (geliştirme için)
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    if (password === adminPassword) {
-      const { passwordHash, ...result } = this.adminUser;
+    const user = await this.usersService.findOne(username);
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const { password: _, ...result } = user;
       return result;
     }
-
     return null;
   }
 
   async login(user: any) {
-    const payload = { username: user.username, sub: user.username };
+    const payload = { username: user.username, sub: user.id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
       user: {
         username: user.username,
+        role: user.role,
       },
     };
   }

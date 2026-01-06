@@ -12,6 +12,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UserRole } from '../users/user.entity';
 import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -19,7 +22,8 @@ import * as path from 'path';
 @Controller('upload')
 export class UploadController {
   @Post('image')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -67,7 +71,8 @@ export class UploadController {
   }
 
   @Get('list')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   listImages() {
     const uploadDir = path.join(process.cwd(), 'uploads');
     

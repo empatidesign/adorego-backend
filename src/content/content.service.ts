@@ -1,181 +1,186 @@
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Content } from './content.entity';
 
 @Injectable()
 export class ContentService {
-  private readonly contentPath = path.join(__dirname, '../../data/content.json');
+  constructor(
+    @InjectRepository(Content)
+    private contentRepository: Repository<Content>,
+  ) {}
 
-  private readContent() {
-    try {
-      const data = fs.readFileSync(this.contentPath, 'utf-8');
-      return JSON.parse(data);
-    } catch (error) {
-      console.error('Content okuma hatası:', error);
-      return {};
-    }
+  private async getContent(key: string, lang: string = 'tr') {
+    const content = await this.contentRepository.findOne({ where: { key, language: lang } });
+    return content ? content.data : (key.includes('features') || key.includes('partners') || key.includes('faq') ? [] : {});
   }
 
-  private writeContent(content: any) {
-    try {
-      fs.writeFileSync(this.contentPath, JSON.stringify(content, null, 2), 'utf-8');
-      return true;
-    } catch (error) {
-      console.error('Content yazma hatası:', error);
-      return false;
+  private async saveContent(key: string, data: any, lang: string = 'tr') {
+    let content = await this.contentRepository.findOne({ where: { key, language: lang } });
+    
+    if (!content) {
+      content = this.contentRepository.create({ key, language: lang, data });
+    } else {
+      content.data = data;
     }
+
+    return await this.contentRepository.save(content);
   }
 
   // Navbar
-  getNavbar(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.navbar || {};
+  async getNavbar(lang: string = 'tr') {
+    return this.getContent('navbar', lang);
   }
 
-  updateNavbar(data: any, lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    content[lang].navbar = data;
-    return this.writeContent(content);
+  async updateNavbar(data: any, lang: string = 'tr') {
+    return this.saveContent('navbar', data, lang);
   }
 
   // Hero
-  getHero(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.hero || {};
+  async getHero(lang: string = 'tr') {
+    return this.getContent('hero', lang);
   }
 
-  updateHero(data: any, lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    content[lang].hero = data;
-    return this.writeContent(content);
+  async updateHero(data: any, lang: string = 'tr') {
+    return this.saveContent('hero', data, lang);
   }
 
   // Features
-  getFeatures(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.features || [];
+  async getFeatures(lang: string = 'tr') {
+    return this.getContent('features', lang);
   }
 
-  updateFeatures(data: any[], lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    content[lang].features = data;
-    return this.writeContent(content);
+  async updateFeatures(data: any[], lang: string = 'tr') {
+    return this.saveContent('features', data, lang);
   }
 
   // Partners
-  getPartners(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.partners || [];
+  async getPartners(lang: string = 'tr') {
+    return this.getContent('partners', lang);
   }
 
-  updatePartners(data: any[], lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    content[lang].partners = data;
-    return this.writeContent(content);
+  async updatePartners(data: any[], lang: string = 'tr') {
+    return this.saveContent('partners', data, lang);
   }
 
   // FAQ
-  getFaq(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.faq || [];
+  async getFaq(lang: string = 'tr') {
+    return this.getContent('faq', lang);
   }
 
-  updateFaq(data: any[], lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    content[lang].faq = data;
-    return this.writeContent(content);
+  async updateFaq(data: any[], lang: string = 'tr') {
+    return this.saveContent('faq', data, lang);
   }
 
   // HowItWorks
-  getHowItWorks(lang: string = 'tr') {
-    const content = this.readContent();
-    const data = content[lang]?.howItWorks || { steps: [], buttons: [] };
+  async getHowItWorks(lang: string = 'tr') {
+    const data = await this.getContent('howItWorks', lang) || { steps: [], buttons: [] };
     // Sıralı şekilde döndür
-    if (data.steps) {
+    if (data.steps && Array.isArray(data.steps)) {
       data.steps = data.steps.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
     }
-    if (data.buttons) {
+    if (data.buttons && Array.isArray(data.buttons)) {
       data.buttons = data.buttons.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
     }
     return data;
   }
 
-  updateHowItWorks(data: any, lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    content[lang].howItWorks = data;
-    return this.writeContent(content);
+  async updateHowItWorks(data: any, lang: string = 'tr') {
+    return this.saveContent('howItWorks', data, lang);
   }
 
   // CTA
-  getCta(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.cta || {};
+  async getCta(lang: string = 'tr') {
+    return this.getContent('cta', lang);
   }
 
-  updateCta(data: any, lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    content[lang].cta = data;
-    return this.writeContent(content);
+  async updateCta(data: any, lang: string = 'tr') {
+    return this.saveContent('cta', data, lang);
   }
 
   // Solutions
-  getSolutions(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.solutions || {};
+  async getSolutions(lang: string = 'tr') {
+    return this.getContent('solutions', lang);
   }
 
-  updateSolutions(data: any, lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    content[lang].solutions = data;
-    return this.writeContent(content);
+  async updateSolutions(data: any, lang: string = 'tr') {
+    return this.saveContent('solutions', data, lang);
   }
 
   // SEO
-  getSeo(page: string = 'home', lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.seo?.[page] || {};
+  async getSeo(page: string = 'home', lang: string = 'tr') {
+    return this.getContent(`seo_${page}`, lang);
   }
 
-  updateSeo(page: string, data: any, lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content[lang]) content[lang] = {};
-    if (!content[lang].seo) content[lang].seo = {};
-    content[lang].seo[page] = data;
-    return this.writeContent(content);
+  async updateSeo(page: string, data: any, lang: string = 'tr') {
+    return this.saveContent(`seo_${page}`, data, lang);
   }
 
-  getAllSeo(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang]?.seo || {};
+  async getAllSeo(lang: string = 'tr') {
+    // Bu metod biraz tricky çünkü SEO verileri ayrı row'larda tutuluyor
+    // Like sorgusu ile tüm seo_* verilerini çekebiliriz
+    const allSeo = await this.contentRepository.createQueryBuilder('content')
+      .where('content.key LIKE :key', { key: 'seo_%' })
+      .andWhere('content.language = :lang', { lang })
+      .getMany();
+    
+    const result = {};
+    allSeo.forEach(item => {
+      const page = item.key.replace('seo_', '');
+      result[page] = item.data;
+    });
+    return result;
   }
 
   // Site Settings
-  getSiteSettings(category?: string, lang: string = 'tr') {
-    const content = this.readContent();
-    const settings = content.siteSettings?.[lang] || {};
-    return category ? settings[category] || {} : settings;
+  async getSiteSettings(category?: string, lang: string = 'tr') {
+    if (category) {
+      return this.getContent(`siteSettings_${category}`, lang);
+    }
+    
+    // Tüm ayarları getir
+    const allSettings = await this.contentRepository.createQueryBuilder('content')
+      .where('content.key LIKE :key', { key: 'siteSettings_%' })
+      .andWhere('content.language = :lang', { lang })
+      .getMany();
+
+    const result = {};
+    allSettings.forEach(item => {
+      const cat = item.key.replace('siteSettings_', '');
+      result[cat] = item.data;
+    });
+    return result;
   }
 
-  updateSiteSettings(category: string, data: any, lang: string = 'tr') {
-    const content = this.readContent();
-    if (!content.siteSettings) content.siteSettings = {};
-    if (!content.siteSettings[lang]) content.siteSettings[lang] = {};
-    content.siteSettings[lang][category] = data;
-    return this.writeContent(content);
+  async updateSiteSettings(category: string, data: any, lang: string = 'tr') {
+    return this.saveContent(`siteSettings_${category}`, data, lang);
   }
 
   // Tüm içeriği getir
-  getAllContent(lang: string = 'tr') {
-    const content = this.readContent();
-    return content[lang] || {};
+  async getAllContent(lang: string = 'tr') {
+    const allContent = await this.contentRepository.find({ where: { language: lang } });
+    const result = {};
+    
+    allContent.forEach(item => {
+      if (item.key.startsWith('seo_')) {
+        if (!result['seo']) result['seo'] = {};
+        result['seo'][item.key.replace('seo_', '')] = item.data;
+      } else if (item.key.startsWith('siteSettings_')) {
+        // siteSettings yapısını json'daki gibi döndürmek için üst yapıyı oluşturmaya gerek yok
+        // çünkü frontend muhtemelen bunu beklemiyor, ama orijinal yapıyı korumaya çalışalım
+        // Orijinal yapı: { siteSettings: { tr: { ... } } } değil, 
+        // getAllContent -> content[lang] döndürüyordu.
+        // Yani result içinde navbar, hero vs. var.
+        // siteSettings normalde content[lang] içinde değil, ayrı bir root key idi.
+        // Ancak getAllContent sadece content[lang] döndürüyordu.
+        // O yüzden siteSettings buraya dahil EDİLMEMELİ, çünkü orijinal kodda:
+        // return content[lang] || {};
+        // ve content yapısı: { tr: { ... }, siteSettings: { ... } }
+        // Yani siteSettings getAllContent içinde gelmiyordu!
+      } else {
+        result[item.key] = item.data;
+      }
+    });
+    return result;
   }
 }
-

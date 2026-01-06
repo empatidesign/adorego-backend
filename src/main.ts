@@ -1,8 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  // Global Validation Pipe
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true, // DTO'da olmayan alanları temizle
+    forbidNonWhitelisted: true, // DTO'da olmayan alan varsa hata fırlat
+    transform: true, // Payload'ı DTO class'ına dönüştür
+    disableErrorMessages: false, // Hata mesajlarını göster (prod'da kapatılabilir)
+  }));
   
   // CORS ayarları
   const corsOrigins = process.env.CORS_ORIGIN 
