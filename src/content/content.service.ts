@@ -54,6 +54,15 @@ export class ContentService {
     return this.saveContent('features', data, lang);
   }
 
+  // Features Header
+  async getFeaturesHeader(lang: string = 'tr') {
+    return this.getContent('featuresHeader', lang);
+  }
+
+  async updateFeaturesHeader(data: any, lang: string = 'tr') {
+    return this.saveContent('featuresHeader', data, lang);
+  }
+
   // Partners
   async getPartners(lang: string = 'tr') {
     return this.getContent('partners', lang);
@@ -70,6 +79,15 @@ export class ContentService {
 
   async updateFaq(data: any[], lang: string = 'tr') {
     return this.saveContent('faq', data, lang);
+  }
+
+  // FAQ Header
+  async getFaqHeader(lang: string = 'tr') {
+    return this.getContent('faqHeader', lang);
+  }
+
+  async updateFaqHeader(data: any, lang: string = 'tr') {
+    return this.saveContent('faqHeader', data, lang);
   }
 
   // HowItWorks
@@ -105,6 +123,33 @@ export class ContentService {
 
   async updateSolutions(data: any, lang: string = 'tr') {
     return this.saveContent('solutions', data, lang);
+  }
+
+  // Target Audience
+  async getTargetAudience(lang: string = 'tr') {
+    return this.getContent('targetAudience', lang);
+  }
+
+  async updateTargetAudience(data: any, lang: string = 'tr') {
+    return this.saveContent('targetAudience', data, lang);
+  }
+
+  // Popular Destinations
+  async getPopularDestinations(lang: string = 'tr') {
+    return this.getContent('popularDestinations', lang);
+  }
+
+  async updatePopularDestinations(data: any, lang: string = 'tr') {
+    return this.saveContent('popularDestinations', data, lang);
+  }
+
+  // Footer
+  async getFooter(lang: string = 'tr') {
+    return this.getContent('footer', lang);
+  }
+
+  async updateFooter(data: any, lang: string = 'tr') {
+    return this.saveContent('footer', data, lang);
   }
 
   // SEO

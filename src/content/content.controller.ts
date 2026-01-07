@@ -25,6 +25,11 @@ export class ContentController {
     return this.contentService.getFeatures(lang);
   }
 
+  @Get('features-header')
+  getFeaturesHeader(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getFeaturesHeader(lang);
+  }
+
   @Get('partners')
   getPartners(@Query('lang') lang: string = 'tr') {
     return this.contentService.getPartners(lang);
@@ -33,6 +38,11 @@ export class ContentController {
   @Get('faq')
   getFaq(@Query('lang') lang: string = 'tr') {
     return this.contentService.getFaq(lang);
+  }
+
+  @Get('faq-header')
+  getFaqHeader(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getFaqHeader(lang);
   }
 
   @Get('howitworks')
@@ -48,6 +58,21 @@ export class ContentController {
   @Get('solutions')
   getSolutions(@Query('lang') lang: string = 'tr') {
     return this.contentService.getSolutions(lang);
+  }
+
+  @Get('target-audience')
+  getTargetAudience(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getTargetAudience(lang);
+  }
+
+  @Get('popular-destinations')
+  getPopularDestinations(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getPopularDestinations(lang);
+  }
+
+  @Get('footer')
+  getFooter(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getFooter(lang);
   }
 
   @Get('seo/:page')
@@ -103,6 +128,15 @@ export class ContentController {
     return { success, message: success ? 'Features güncellendi' : 'Güncelleme başarısız' };
   }
 
+  @Put('features-header')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateFeaturesHeader(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateFeaturesHeader(data, lang);
+    return { success, message: success ? 'Features başlık güncellendi' : 'Güncelleme başarısız' };
+  }
+
   @Put('partners')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -119,6 +153,15 @@ export class ContentController {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateFaq(data, lang);
     return { success, message: success ? 'FAQ güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  @Put('faq-header')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateFaqHeader(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateFaqHeader(data, lang);
+    return { success, message: success ? 'FAQ başlık güncellendi' : 'Güncelleme başarısız' };
   }
 
   @Put('howitworks')
@@ -146,6 +189,33 @@ export class ContentController {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateSolutions(data, lang);
     return { success, message: success ? 'Solutions güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  @Put('target-audience')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateTargetAudience(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateTargetAudience(data, lang);
+    return { success, message: success ? 'Target Audience güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  @Put('popular-destinations')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updatePopularDestinations(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updatePopularDestinations(data, lang);
+    return { success, message: success ? 'Popular Destinations güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  @Put('footer')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateFooter(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateFooter(data, lang);
+    return { success, message: success ? 'Footer güncellendi' : 'Güncelleme başarısız' };
   }
 
   @Put('seo/:page')
