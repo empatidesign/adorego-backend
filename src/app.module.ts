@@ -17,7 +17,7 @@ import { User } from './users/user.entity';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT, 10) || 5433,
+      port: parseInt(process.env.DB_PORT, 10) || 5435,
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'password123',
       database: process.env.DB_DATABASE || 'adorego',

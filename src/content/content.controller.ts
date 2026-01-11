@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Body, UseGuards, Query, Param } from '@nestjs/common';
+import { Controller, Get, Put, Post, Delete, Body, UseGuards, Query, Param } from '@nestjs/common';
 import { ContentService } from './content.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -7,7 +7,7 @@ import { UserRole } from '../users/user.entity';
 
 @Controller('content')
 export class ContentController {
-  constructor(private contentService: ContentService) {}
+  constructor(private contentService: ContentService) { }
 
   // Public endpoints - Ana site için
   @Get('navbar')
@@ -98,6 +98,11 @@ export class ContentController {
   @Get('all')
   getAllContent(@Query('lang') lang: string = 'tr') {
     return this.contentService.getAllContent(lang);
+  }
+
+  @Get('page/:slug')
+  getContentPage(@Param('slug') slug: string, @Query('lang') lang: string = 'tr') {
+    return this.contentService.getContentPage(slug, lang);
   }
 
   // Protected endpoints - Admin paneli için
@@ -234,6 +239,50 @@ export class ContentController {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateSiteSettings(category, data, lang);
     return { success, message: success ? 'Site ayarları güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  // Blog endpoints
+  @Get('blogs')
+  getBlogs(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getBlogs(lang);
+  }
+
+  @Get('blog/:slug')
+  getBlog(@Param('slug') slug: string, @Query('lang') lang: string = 'tr') {
+    return this.contentService.getBlog(slug, lang);
+  }
+
+  @Post('blog')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  createBlog(@Body() body: any) {
+    const success = this.contentService.createBlog(body);
+    return { success, message: success ? 'Blog oluşturuldu' : 'Oluşturma başarısız' };
+  }
+
+  @Put('blog/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateBlog(@Param('id') id: string, @Body() body: any) {
+    const success = this.contentService.updateBlog(id, body);
+    return { success, message: success ? 'Blog güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  @Delete('blog/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  deleteBlog(@Param('id') id: string) {
+    const success = this.contentService.deleteBlog(id);
+    return { success, message: success ? 'Blog silindi' : 'Silme başarısız' };
+  }
+
+  @Put('page/:slug')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateContentPage(@Param('slug') slug: string, @Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateContentPage(slug, data, lang);
+    return { success, message: success ? 'Sayfa güncellendi' : 'Güncelleme başarısız' };
   }
 }
 

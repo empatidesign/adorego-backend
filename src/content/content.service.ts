@@ -8,7 +8,7 @@ export class ContentService {
   constructor(
     @InjectRepository(Content)
     private contentRepository: Repository<Content>,
-  ) {}
+  ) { }
 
   private async getContent(key: string, lang: string = 'tr') {
     const content = await this.contentRepository.findOne({ where: { key, language: lang } });
@@ -17,7 +17,7 @@ export class ContentService {
 
   private async saveContent(key: string, data: any, lang: string = 'tr') {
     let content = await this.contentRepository.findOne({ where: { key, language: lang } });
-    
+
     if (!content) {
       content = this.contentRepository.create({ key, language: lang, data });
     } else {
@@ -168,7 +168,7 @@ export class ContentService {
       .where('content.key LIKE :key', { key: 'seo_%' })
       .andWhere('content.language = :lang', { lang })
       .getMany();
-    
+
     const result = {};
     allSeo.forEach(item => {
       const page = item.key.replace('seo_', '');
@@ -182,7 +182,7 @@ export class ContentService {
     if (category) {
       return this.getContent(`siteSettings_${category}`, lang);
     }
-    
+
     // Tüm ayarları getir
     const allSettings = await this.contentRepository.createQueryBuilder('content')
       .where('content.key LIKE :key', { key: 'siteSettings_%' })
@@ -205,7 +205,7 @@ export class ContentService {
   async getAllContent(lang: string = 'tr') {
     const allContent = await this.contentRepository.find({ where: { language: lang } });
     const result = {};
-    
+
     allContent.forEach(item => {
       if (item.key.startsWith('seo_')) {
         if (!result['seo']) result['seo'] = {};
@@ -227,5 +227,79 @@ export class ContentService {
       }
     });
     return result;
+  }
+  // Blog methods
+  async getBlogs(lang: string = 'tr') {
+    const blogs = await this.getContent('blogs', lang);
+    return Array.isArray(blogs) ? blogs : [];
+  }
+
+  async getBlog(slug: string, lang: string = 'tr') {
+    const blogs = await this.getBlogs(lang);
+    return blogs.find((blog: any) => blog.slug === slug) || null;
+  }
+
+  async createBlog(blogData: any) {
+    // Her iki dil için de blog oluştur
+    const blogsTR = await this.getBlogs('tr');
+    const blogsEN = await this.getBlogs('en');
+
+    // ID oluştur
+    const id = Date.now().toString();
+    const newBlog = { ...blogData, id };
+
+    // TR versiyonu
+    blogsTR.push(newBlog);
+    await this.saveContent('blogs', blogsTR, 'tr');
+
+    // EN versiyonu
+    blogsEN.push(newBlog);
+    await this.saveContent('blogs', blogsEN, 'en');
+
+    return true;
+  }
+
+  async updateBlog(id: string, blogData: any) {
+    // Her iki dil için de güncelle
+    const blogsTR = await this.getBlogs('tr');
+    const blogsEN = await this.getBlogs('en');
+
+    const indexTR = blogsTR.findIndex((blog: any) => blog.id === id);
+    const indexEN = blogsEN.findIndex((blog: any) => blog.id === id);
+
+    if (indexTR !== -1) {
+      blogsTR[indexTR] = { ...blogsTR[indexTR], ...blogData, id };
+      await this.saveContent('blogs', blogsTR, 'tr');
+    }
+
+    if (indexEN !== -1) {
+      blogsEN[indexEN] = { ...blogsEN[indexEN], ...blogData, id };
+      await this.saveContent('blogs', blogsEN, 'en');
+    }
+
+    return indexTR !== -1 || indexEN !== -1;
+  }
+
+  async deleteBlog(id: string) {
+    // Her iki dilden de sil
+    const blogsTR = await this.getBlogs('tr');
+    const blogsEN = await this.getBlogs('en');
+
+    const filteredTR = blogsTR.filter((blog: any) => blog.id !== id);
+    const filteredEN = blogsEN.filter((blog: any) => blog.id !== id);
+
+    await this.saveContent('blogs', filteredTR, 'tr');
+    await this.saveContent('blogs', filteredEN, 'en');
+
+    return true;
+  }
+
+  // Content Page methods
+  async getContentPage(slug: string, lang: string = 'tr') {
+    return this.getContent(`page_${slug}`, lang);
+  }
+
+  async updateContentPage(slug: string, data: any, lang: string = 'tr') {
+    return this.saveContent(`page_${slug}`, data, lang);
   }
 }
