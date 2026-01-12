@@ -75,6 +75,11 @@ export class ContentController {
     return this.contentService.getFooter(lang);
   }
 
+  @Get('pricing')
+  getPricing(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getPricing(lang);
+  }
+
   @Get('seo/:page')
   getSeo(@Param('page') page: string, @Query('lang') lang: string = 'tr') {
     return this.contentService.getSeo(page, lang);
@@ -105,7 +110,14 @@ export class ContentController {
     return this.contentService.getContentPage(slug, lang);
   }
 
-  // Protected endpoints - Admin paneli için
+  @Put('page/:slug')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateContentPage(@Param('slug') slug: string, @Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateContentPage(slug, data, lang);
+    return { success, message: success ? 'Sayfa güncellendi' : 'Güncelleme başarısız' };
+  }
   @Put('navbar')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -223,6 +235,43 @@ export class ContentController {
     return { success, message: success ? 'Footer güncellendi' : 'Güncelleme başarısız' };
   }
 
+  @Put('pricing')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updatePricing(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updatePricing(data, lang);
+    return { success, message: success ? 'Fiyat listesi güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  @Get('tracking')
+  getTracking(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getTracking(lang);
+  }
+
+  @Put('tracking')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateTracking(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateTracking(data, lang);
+    return { success, message: success ? 'Gönderi takibi güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  @Get('contact')
+  getContact(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getContact(lang);
+  }
+
+  @Put('contact')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateContact(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateContact(data, lang);
+    return { success, message: success ? 'İletişim sayfası güncellendi' : 'Güncelleme başarısız' };
+  }
+
   @Put('seo/:page')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
@@ -247,9 +296,10 @@ export class ContentController {
     return this.contentService.getBlogs(lang);
   }
 
-  @Get('blog/:slug')
-  getBlog(@Param('slug') slug: string, @Query('lang') lang: string = 'tr') {
-    return this.contentService.getBlog(slug, lang);
+  @Get('blog/:identifier')
+  getBlog(@Param('identifier') identifier: string, @Query('lang') lang: string = 'tr') {
+    // identifier slug veya id olabilir
+    return this.contentService.getBlogByIdentifier(identifier, lang);
   }
 
   @Post('blog')
@@ -276,13 +326,39 @@ export class ContentController {
     return { success, message: success ? 'Blog silindi' : 'Silme başarısız' };
   }
 
-  @Put('page/:slug')
+  // Newsletter subscription
+  @Post('newsletter/subscribe')
+  subscribeNewsletter(@Body() body: { email: string }) {
+    const success = this.contentService.subscribeNewsletter(body.email);
+    return { success, message: success ? 'Bültene başarıyla abone oldunuz' : 'Abonelik başarısız' };
+  }
+
+  @Get('newsletter/subscribers')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  updateContentPage(@Param('slug') slug: string, @Body() body: { data: any; lang: string }) {
-    const { data, lang = 'tr' } = body;
-    const success = this.contentService.updateContentPage(slug, data, lang);
-    return { success, message: success ? 'Sayfa güncellendi' : 'Güncelleme başarısız' };
+  getNewsletterSubscribers() {
+    return this.contentService.getNewsletterSubscribers();
+  }
+
+  // Contact form submission
+  @Post('contact/submit')
+  submitContactForm(@Body() body: { name: string; email: string; phone?: string; subject: string; message: string }) {
+    const success = this.contentService.submitContactForm(body);
+    return { success, message: success ? 'Mesajınız başarıyla gönderildi' : 'Gönderim başarısız' };
+  }
+
+  @Get('contact/messages')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  getContactMessages() {
+    return this.contentService.getContactMessages();
+  }
+
+  @Put('contact/messages/:id/read')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  markMessageAsRead(@Param('id') id: string) {
+    const success = this.contentService.markMessageAsRead(id);
+    return { success, message: success ? 'Mesaj okundu olarak işaretlendi' : 'İşaretleme başarısız' };
   }
 }
-

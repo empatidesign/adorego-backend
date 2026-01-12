@@ -50,7 +50,7 @@ export class UploadController {
       return { success: false, message: 'Dosya yüklenemedi' };
     }
 
-    const imageUrl = `/api/upload/images/${file.filename}`;
+    const imageUrl = `/upload/images/${file.filename}`;
     return {
       success: true,
       message: 'Resim başarıyla yüklendi',
@@ -85,7 +85,7 @@ export class UploadController {
       .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
       .map(file => ({
         filename: file,
-        url: `/api/upload/images/${file}`,
+        url: `/upload/images/${file}`,
         uploadDate: fs.statSync(path.join(uploadDir, file)).mtime,
       }))
       .sort((a, b) => b.uploadDate.getTime() - a.uploadDate.getTime());
