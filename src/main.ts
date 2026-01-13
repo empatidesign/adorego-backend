@@ -23,10 +23,17 @@ async function bootstrap() {
   // CORS ayarları
   const corsOrigins = process.env.CORS_ORIGIN 
     ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000', 'http://192.168.2.211:3000'];
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'];
   
   app.enableCors({
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      // Origin yoksa (Postman gibi) veya izin verilen listede ise kabul et
+      if (!origin || corsOrigins.includes(origin) || corsOrigins.includes('*')) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS policy tarafından engellenmiş'));
+      }
+    },
     credentials: true,
   });
 
