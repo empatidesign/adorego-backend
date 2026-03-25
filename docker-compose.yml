@@ -21,15 +21,16 @@ services:
     depends_on:
       - db
     environment:
+      - NODE_ENV=production
       - DB_HOST=db
       - DB_PORT=5432
       - DB_USERNAME=postgres
       - DB_PASSWORD=password123
       - DB_DATABASE=adorego
-      - JWT_SECRET=adorego-super-secret-key-2024
+      - JWT_SECRET=97389d827adcf1580f401ca6291d20deff4f554b41cffcf22c04ed2391846cf23224981f1ce6c9251689c99df0eb0e9edcb8cdf9c1e9f5d2e18d082fb65fc5b3
       - JWT_EXPIRES_IN=24h
       - PORT=3001
-      - CORS_ORIGIN=http://localhost,http://localhost:5173,http://localhost:3001
+      - CORS_ORIGIN=http://185.51.20.32:3006,https://adorelgo.com,http://adorelgo.com
     ports:
       - "3002:3001"
     volumes:
@@ -42,7 +43,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "3001:80"
+      - "3006:80"
 
 volumes:
   postgres_data:

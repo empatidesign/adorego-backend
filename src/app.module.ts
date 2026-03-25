@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -18,28 +18,20 @@ import { User } from './users/user.entity';
     }),
     // Global rate limiter: max 100 istek / 60 saniye (login endpoint'i ayrıca kısıtlı)
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5435),
-        username: config.get<string>('DB_USERNAME', 'postgres'),
-        password: config.get<string>('DB_PASSWORD'),
-        database: config.get<string>('DB_DATABASE', 'adorego'),
-        entities: [Content, User],
-        synchronize: config.get<string>('NODE_ENV') !== 'production',
-      }),
-      inject: [ConfigService],
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT, 10) || 5435,
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE || 'adorego',
+      entities: [Content, User],
+      synchronize: process.env.NODE_ENV !== 'production',
     }),
-    JwtModule.registerAsync({
+    JwtModule.register({
       global: true,
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        secret: config.getOrThrow<string>('JWT_SECRET'),
-        signOptions: { expiresIn: config.get<string>('JWT_EXPIRES_IN', '24h') },
-      }),
-      inject: [ConfigService],
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
     }),
     AuthModule,
     UsersModule,
