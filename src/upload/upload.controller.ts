@@ -35,7 +35,10 @@ export class UploadController {
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+        const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+        const ext = extname(file.originalname).toLowerCase();
+        if (!allowedMimes.includes(file.mimetype) || !allowedExts.includes(ext)) {
           return callback(new Error('Sadece resim dosyaları yüklenebilir!'), false);
         }
         callback(null, true);
@@ -61,12 +64,30 @@ export class UploadController {
 
   @Get('images/:filename')
   getImage(@Param('filename') filename: string, @Res() res: Response) {
-    const filePath = path.join(process.cwd(), 'uploads', filename);
-    
+    // Path traversal koruması: sadece basit dosya adına izin ver
+    if (!filename || filename.includes('/') || filename.includes('\\') || filename.includes('..')) {
+      return res.status(400).json({ message: 'Geçersiz dosya adı' });
+    }
+
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const ext = path.extname(filename).toLowerCase();
+    if (!allowedExts.includes(ext)) {
+      return res.status(400).json({ message: 'Geçersiz dosya tipi' });
+    }
+
+    const uploadsDir = path.resolve(process.cwd(), 'uploads');
+    const filePath = path.resolve(uploadsDir, filename);
+
+    // Çözümlenen yol uploads klasörü dışına çıkıyor mu?
+    if (!filePath.startsWith(uploadsDir + path.sep)) {
+      return res.status(400).json({ message: 'Geçersiz dosya yolu' });
+    }
+
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: 'Resim bulunamadı' });
     }
 
+    res.setHeader('Content-Disposition', 'inline');
     return res.sendFile(filePath);
   }
 

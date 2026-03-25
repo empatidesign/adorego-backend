@@ -3,21 +3,27 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  
+
+  // Güvenlik headerları
+  app.use(helmet());
+
   // Static files (uploads klasörü)
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
-  
+
+  const isProd = process.env.NODE_ENV === 'production';
+
   // Global Validation Pipe
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // DTO'da olmayan alanları temizle
-    forbidNonWhitelisted: true, // DTO'da olmayan alan varsa hata fırlat
-    transform: true, // Payload'ı DTO class'ına dönüştür
-    disableErrorMessages: false, // Hata mesajlarını göster (prod'da kapatılabilir)
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+    disableErrorMessages: isProd,
   }));
   
   // CORS ayarları

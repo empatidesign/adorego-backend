@@ -4,6 +4,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../users/user.entity';
+import { NewsletterSubscribeDto } from './newsletter.dto';
+import { ContactFormDto } from './contact-form.dto';
 
 @Controller('content')
 export class ContentController {
@@ -328,7 +330,7 @@ export class ContentController {
 
   // Newsletter subscription
   @Post('newsletter/subscribe')
-  subscribeNewsletter(@Body() body: { email: string }) {
+  subscribeNewsletter(@Body() body: NewsletterSubscribeDto) {
     const success = this.contentService.subscribeNewsletter(body.email);
     return { success, message: success ? 'Bültene başarıyla abone oldunuz' : 'Abonelik başarısız' };
   }
@@ -342,7 +344,7 @@ export class ContentController {
 
   // Contact form submission
   @Post('contact/submit')
-  submitContactForm(@Body() body: { name: string; email: string; phone?: string; subject: string; message: string }) {
+  submitContactForm(@Body() body: ContactFormDto) {
     const success = this.contentService.submitContactForm(body);
     return { success, message: success ? 'Mesajınız başarıyla gönderildi' : 'Gönderim başarısız' };
   }

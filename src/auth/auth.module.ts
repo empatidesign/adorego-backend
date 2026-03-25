@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
@@ -10,10 +9,7 @@ import { UsersModule } from '../users/users.module';
   imports: [
     UsersModule,
     PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'adorego-super-secret-key-2024',
-      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
-    }),
+    // JwtModule global olarak app.module.ts'de tek yerden yönetiliyor
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

@@ -519,12 +519,10 @@ export class ContentService {
   async subscribeNewsletter(email: string) {
     try {
       const subscribers = await this.getNewsletterSubscribers();
-      console.log('Mevcut aboneler:', subscribers);
-      
+
       // Email zaten kayıtlı mı kontrol et
       if (subscribers.some((sub: any) => sub.email === email)) {
-        console.log('Email zaten kayıtlı:', email);
-        return false; // Zaten kayıtlı
+        return false;
       }
 
       const newSubscriber = {
@@ -532,13 +530,9 @@ export class ContentService {
         subscribedAt: new Date().toISOString(),
         active: true
       };
-      
-      subscribers.push(newSubscriber);
-      console.log('Yeni abone ekleniyor:', newSubscriber);
-      console.log('Güncel liste:', subscribers);
 
-      const result = await this.saveContent('newsletter_subscribers', subscribers, 'tr');
-      console.log('Kayıt sonucu:', result);
+      subscribers.push(newSubscriber);
+      await this.saveContent('newsletter_subscribers', subscribers, 'tr');
       return true;
     } catch (error) {
       console.error('Newsletter subscription error:', error);
