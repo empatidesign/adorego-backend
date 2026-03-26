@@ -107,6 +107,28 @@ export class ContentController {
     return this.contentService.getAllContent(lang);
   }
 
+  @Get('pages')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  listContentPages(@Query('lang') lang: string = 'tr') {
+    return this.contentService.listContentPages(lang);
+  }
+
+  @Post('pages')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  createContentPage(@Body() body: { slug: string; data: any; lang?: string }) {
+    const { slug, data, lang = 'tr' } = body;
+    return this.contentService.createContentPage(slug, data, lang);
+  }
+
+  @Delete('pages/:slug')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  deleteContentPage(@Param('slug') slug: string, @Query('lang') lang: string = 'tr') {
+    return this.contentService.deleteContentPage(slug, lang);
+  }
+
   @Get('page/:slug')
   getContentPage(@Param('slug') slug: string, @Query('lang') lang: string = 'tr') {
     return this.contentService.getContentPage(slug, lang);
@@ -333,6 +355,76 @@ export class ContentController {
   subscribeNewsletter(@Body() body: NewsletterSubscribeDto) {
     const success = this.contentService.subscribeNewsletter(body.email);
     return { success, message: success ? 'Bültene başarıyla abone oldunuz' : 'Abonelik başarısız' };
+  }
+
+  @Get('about')
+  getAbout(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getAbout(lang);
+  }
+
+  @Put('about')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateAbout(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateAbout(data, lang);
+    return { success, message: 'Güncellendi' };
+  }
+
+  @Get('international')
+  getInternational(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getInternational(lang);
+  }
+
+  @Put('international')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateInternational(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateInternational(data, lang);
+    return { success, message: 'Güncellendi' };
+  }
+
+  @Get('domestic')
+  getDomestic(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getDomestic(lang);
+  }
+
+  @Put('domestic')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateDomestic(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateDomestic(data, lang);
+    return { success, message: 'Güncellendi' };
+  }
+
+  @Get('home-cta')
+  getHomeCta(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getHomeCta(lang);
+  }
+
+  @Put('home-cta')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateHomeCta(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateHomeCta(data, lang);
+    return { success, message: 'Güncellendi' };
+  }
+
+  @Get('usecases')
+  getUseCases(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getUseCases(lang);
+  }
+
+  @Put('usecases')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateUseCases(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateUseCases(data, lang);
+    return { success, message: 'Güncellendi' };
   }
 
   @Get('newsletter/subscribers')

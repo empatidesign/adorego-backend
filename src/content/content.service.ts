@@ -68,7 +68,7 @@ export class ContentService {
     return this.getContent('partners', lang);
   }
 
-  async updatePartners(data: any[], lang: string = 'tr') {
+  async updatePartners(data: any, lang: string = 'tr') {
     return this.saveContent('partners', data, lang);
   }
 
@@ -132,6 +132,47 @@ export class ContentService {
 
   async updateTargetAudience(data: any, lang: string = 'tr') {
     return this.saveContent('targetAudience', data, lang);
+  }
+
+  // Use Cases
+  async getUseCases(lang: string = 'tr') {
+    return this.getContent('useCases', lang);
+  }
+
+  async updateUseCases(data: any, lang: string = 'tr') {
+    return this.saveContent('useCases', data, lang);
+  }
+
+  async getAbout(lang: string = 'tr') {
+    return this.getContent('about', lang);
+  }
+
+  async updateAbout(data: any, lang: string = 'tr') {
+    return this.saveContent('about', data, lang);
+  }
+
+  async getInternational(lang: string = 'tr') {
+    return this.getContent('international', lang);
+  }
+
+  async updateInternational(data: any, lang: string = 'tr') {
+    return this.saveContent('international', data, lang);
+  }
+
+  async getDomestic(lang: string = 'tr') {
+    return this.getContent('domestic', lang);
+  }
+
+  async updateDomestic(data: any, lang: string = 'tr') {
+    return this.saveContent('domestic', data, lang);
+  }
+
+  async getHomeCta(lang: string = 'tr') {
+    return this.getContent('homeCta', lang);
+  }
+
+  async updateHomeCta(data: any, lang: string = 'tr') {
+    return this.saveContent('homeCta', data, lang);
   }
 
   // Popular Destinations
@@ -307,7 +348,7 @@ export class ContentService {
           phoneLabel: 'Telefon',
           phoneValue: '+90 (212) 123 45 67',
           emailLabel: 'E-posta',
-          emailValue: 'info@adorego.com',
+          emailValue: 'info@adorelgo.com',
           workingHoursLabel: 'Çalışma saatleri',
           workingHoursValue: 'Pazartesi - Cuma: 09:00 - 18:00',
           quickSupportTitle: 'Hızlı destek hattı',
@@ -332,7 +373,7 @@ export class ContentService {
           phoneLabel: 'Phone',
           phoneValue: '+90 (212) 123 45 67',
           emailLabel: 'Email',
-          emailValue: 'info@adorego.com',
+          emailValue: 'info@adorelgo.com',
           workingHoursLabel: 'Working hours',
           workingHoursValue: 'Monday - Friday: 09:00 - 18:00',
           quickSupportTitle: 'Quick support',
@@ -499,6 +540,30 @@ export class ContentService {
   }
 
   // Content Page methods
+  async listContentPages(lang: string = 'tr') {
+    const all = await this.contentRepository.find({ where: { language: lang } });
+    return all
+      .filter(c => c.key.startsWith('page_'))
+      .map(c => ({
+        slug: c.key.replace('page_', ''),
+        title: c.data?.title || c.key.replace('page_', ''),
+        description: c.data?.description || '',
+      }));
+  }
+
+  async createContentPage(slug: string, data: any, lang: string = 'tr') {
+    return this.saveContent(`page_${slug}`, data, lang);
+  }
+
+  async deleteContentPage(slug: string, lang: string = 'tr') {
+    const content = await this.contentRepository.findOne({ where: { key: `page_${slug}`, language: lang } });
+    if (content) {
+      await this.contentRepository.remove(content);
+      return true;
+    }
+    return false;
+  }
+
   async getContentPage(slug: string, lang: string = 'tr') {
     return this.getContent(`page_${slug}`, lang);
   }

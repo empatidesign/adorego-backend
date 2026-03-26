@@ -20,6 +20,17 @@ export class UsersService implements OnModuleInit {
     return this.usersRepository.findOne({ where: { username } });
   }
 
+  async changePassword(username: string, currentPassword: string, newPassword: string): Promise<boolean> {
+    const user = await this.findOne(username);
+    if (!user) return false;
+    const valid = await bcrypt.compare(currentPassword, user.password);
+    if (!valid) return false;
+    const salt = await bcrypt.genSalt();
+    user.password = await bcrypt.hash(newPassword, salt);
+    await this.usersRepository.save(user);
+    return true;
+  }
+
   async create(user: Partial<User>): Promise<User> {
     const salt = await bcrypt.genSalt();
     user.password = await bcrypt.hash(user.password, salt);
