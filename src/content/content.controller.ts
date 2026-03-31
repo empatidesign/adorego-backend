@@ -82,6 +82,11 @@ export class ContentController {
     return this.contentService.getPricing(lang);
   }
 
+  @Get('howtosend')
+  getHowToSend(@Query('lang') lang: string = 'tr') {
+    return this.contentService.getHowToSend(lang);
+  }
+
   @Get('seo/:page')
   getSeo(@Param('page') page: string, @Query('lang') lang: string = 'tr') {
     return this.contentService.getSeo(page, lang);
@@ -212,6 +217,15 @@ export class ContentController {
     const { data, lang = 'tr' } = body;
     const success = this.contentService.updateHowItWorks(data, lang);
     return { success, message: success ? 'How It Works güncellendi' : 'Güncelleme başarısız' };
+  }
+
+  @Put('howtosend')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateHowToSend(@Body() body: { data: any; lang: string }) {
+    const { data, lang = 'tr' } = body;
+    const success = this.contentService.updateHowToSend(data, lang);
+    return { success, message: success ? 'Nasıl Gönderirim güncellendi' : 'Güncelleme başarısız' };
   }
 
   @Put('cta')

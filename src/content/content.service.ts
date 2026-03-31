@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Content } from './content.entity';
 
+const DEFAULT_CONTACT_MAP_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d245.294717533184!2d32.82214850442983!3d39.76911265077443!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14d345e33d97fc47%3A0xd4b2a2f7ce3c8e2b!2sAdorel!5e1!3m2!1sen!2str!4v1774722441289!5m2!1sen!2str';
+
 @Injectable()
 export class ContentService {
   constructor(
@@ -287,6 +289,15 @@ export class ContentService {
     return this.saveContent('pricing', data, lang);
   }
 
+  // How To Send
+  async getHowToSend(lang: string = 'tr') {
+    return this.getContent('howtosend', lang);
+  }
+
+  async updateHowToSend(data: any, lang: string = 'tr') {
+    return this.saveContent('howtosend', data, lang);
+  }
+
   // Tracking
   async getTracking(lang: string = 'tr') {
     const data = await this.getContent('tracking', lang);
@@ -354,7 +365,7 @@ export class ContentService {
           quickSupportTitle: 'Hızlı destek hattı',
           quickSupportDesc: 'Her türlü sorunuz için WhatsApp üzerinden bize anında ulaşabilirsiniz.',
           whatsappNumber: '+905551234567',
-          mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.2266489!2d28.9784!3d41.0082!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDAwJzI5LjUiTiAyOMKwNTgnNDIuMiJF!5e0!3m2!1str!2str!4v1234567890'
+          mapUrl: DEFAULT_CONTACT_MAP_URL
         };
       } else {
         return {
@@ -379,7 +390,7 @@ export class ContentService {
           quickSupportTitle: 'Quick support',
           quickSupportDesc: 'You can reach us instantly via WhatsApp for any questions.',
           whatsappNumber: '+905551234567',
-          mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.2266489!2d28.9784!3d41.0082!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDHCsDAwJzI5LjUiTiAyOMKwNTgnNDIuMiJF!5e0!3m2!1str!2str!4v1234567890'
+          mapUrl: DEFAULT_CONTACT_MAP_URL
         };
       }
     }
